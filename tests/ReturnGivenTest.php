@@ -1,12 +1,5 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Test\olvlvl\Given;
 
 use BadMethodCallException;
@@ -332,7 +325,7 @@ final class ReturnGivenTest extends TestCase
     }
 
     /**
-     * Make sure termination check works with "empty" values.
+     * Make sure the termination check works with "empty" values.
      */
     public function testBoolean(): void
     {

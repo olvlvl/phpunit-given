@@ -1,7 +1,6 @@
 # olvlvl/phpunit-given
 
 [![Packagist](https://img.shields.io/packagist/v/olvlvl/phpunit-given.svg)](https://packagist.org/packages/olvlvl/phpunit-given)
-[![Code Quality](https://img.shields.io/scrutinizer/g/olvlvl/phpunit-given.svg)](https://scrutinizer-ci.com/g/olvlvl/phpunit-given)
 [![Code Coverage](https://img.shields.io/coveralls/olvlvl/phpunit-given.svg)](https://coveralls.io/r/olvlvl/phpunit-given)
 [![Downloads](https://img.shields.io/packagist/dt/olvlvl/phpunit-given.svg)](https://packagist.org/packages/olvlvl/phpunit-given)
 
@@ -10,6 +9,24 @@ _olvlvl/phpunit-given_ provides an alternative to [PHPUnit](https://phpunit.de/)
 #### Disclaimer
 
 In most cases `ReturnCallback` with `match` can be used effectively. Don't use this package if you're comfortable with these and don't need extra features.
+
+```php
+$mock = $this->createMock(IntegerName::class);
+$mock->method('name')->willReturnCallback(fn (Integer $int) => match (true) {
+    $int < new Integer(6) => 'too small',
+    $int > new Integer(9) => 'too big',
+    default => 'just right';
+}));
+```
+
+```php
+$mock = $this->createMock(IntegerName::class);
+$mock->method('name')->will($this
+    ->given(Assert::lessThan(new Integer(6)))->return('too small')
+    ->given(Assert::greaterThan(new Integer(9)))->return('too big')
+    ->default()->return('just right')
+);
+```
 
 #### Usage
 
@@ -92,17 +109,18 @@ $mock->method('name')->willReturnCallback(fn (Integer $int) => match ($int) {
 }));
 ```
 
-My motivation creating _olvlvl/phpunit-given_, is to have an alternative to [ReturnValueMap][] and [ReturnCallback][], that looks similar to what we find in other testing frameworks, and that allows easy migration from [Prophecy][].
+My motivation for creating _olvlvl/phpunit-given_, is to have an alternative to [ReturnValueMap][] and [ReturnCallback][], that looks similar to what we find in other testing frameworks, and that allows easy migration from [Prophecy][].
 
 Some PHPUnit issues, for reference:
 
 - [Feature similar to withConsecutive(), but without checking order](https://github.com/sebastianbergmann/phpunit/issues/4026)
 - [Improvements on withConsecutive with return](https://github.com/sebastianbergmann/phpunit/issues/4255)
 - [Remove withConsecutive()](https://github.com/sebastianbergmann/phpunit/issues/4565)
+- [Symphony: Remove occurrences of withConsecutive()](https://github.com/symfony/symfony/pull/49621/files)
 
 ## Use cases
 
-### Comparing objects
+### Comparing with objects
 
 [ReturnValueMap][] doesn't work with objects because it [uses strict equality when comparing
 arguments](https://github.com/sebastianbergmann/phpunit/blob/39efa00da7afd8460975f8532eb2687288472c27/src/Framework/MockObject/Stub/ReturnValueMap.php#L40). The following code throws a `TypeError` exception because `ReturnValueMap` cannot find a match and defaults to a `null` value.
@@ -143,24 +161,13 @@ $mock = $this->createMock(IntegerName::class);
 $mock->method('name')->will($this
     ->given(Assert::lessThan(new Integer(6)))->return('too small')
     ->given(Assert::greaterThan(new Integer(9)))->return('too big')
-    ->default()->return('just right') // `default()` is a shortcut for `given(Assert::anything())`
+    ->default()->return('just right')
 );
 
 $this->assertEquals("too small", $mock->name(new Integer(5)));
 $this->assertEquals("too big", $mock->name(new Integer(10)));
 $this->assertEquals("just right", $mock->name(new Integer(6)));
 $this->assertEquals("just right", $mock->name(new Integer(9)));
-```
-
-Of course, you could use `ReturnCallback`, although it adds logic to the test. Use whatever you feel more comfortable with.
-
-```php
-$mock = $this->createMock(IntegerName::class);
-$mock->method('name')->willReturnCallback(fn (Integer $int) => match (true) {
-    $int < new Integer(6) => 'too small',
-    $int > new Integer(9) => 'too big',
-    default => 'just right';
-}));
 ```
 
 
@@ -226,22 +233,22 @@ LogicException : Unexpected invocation: Test\olvlvl\Given\Acme\IntegerName::name
 
 The project is continuously tested by [GitHub actions](https://github.com/olvlvl/phpunit-given/actions).
 
-[![Tests](https://github.com/olvlvl/phpunit-given/workflows/test/badge.svg?branch=main)](https://github.com/olvlvl/phpunit-given/actions?query=workflow%3Atest)
-[![Static Analysis](https://github.com/olvlvl/phpunit-given/workflows/static-analysis/badge.svg?branch=main)](https://github.com/olvlvl/phpunit-given/actions?query=workflow%3Astatic-analysis)
-[![Code Style](https://github.com/olvlvl/phpunit-given/workflows/code-style/badge.svg?branch=main)](https://github.com/olvlvl/phpunit-given/actions?query=workflow%3Acode-style)
+[![Tests](https://github.com/olvlvl/phpunit-given/actions/workflows/test.yml/badge.svg)](https://github.com/olvlvl/phpunit-given/actions/workflows/test.yml)
+[![Static Analysis](https://github.com/olvlvl/phpunit-given/actions/workflows/static-analysis.yml/badge.svg)](https://github.com/olvlvl/phpunit-given/actions/workflows/static-analysis.yml)
+[![Code Style](https://github.com/olvlvl/phpunit-given/actions/workflows/code-style.yml/badge.svg)](https://github.com/olvlvl/phpunit-given/actions/workflows/code-style.yml)
 
 
 
 ## Code of Conduct
 
 This project adheres to a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in
-this project and its community, you are expected to uphold this code.
+this project and its community, you're expected to uphold this code.
 
 
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+See [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 
 

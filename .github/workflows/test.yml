@@ -11,11 +11,12 @@ jobs:
     strategy:
       matrix:
         php-version:
+        - "8.0"
         - "8.1"
         - "8.2"
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
@@ -24,7 +25,7 @@ jobs:
         ini-values: memory_limit=-1
         tools: composer:v2
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.composer/cache
