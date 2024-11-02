@@ -2,12 +2,15 @@
 
 namespace Test\olvlvl\Given;
 
-use BadMethodCallException;
 use Exception;
 use LogicException;
 use olvlvl\Given\GivenTrait;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\ConfigurableMethod;
 use PHPUnit\Framework\MockObject\Invocation;
+use PHPUnit\Framework\MockObject\InvocationHandler;
+use PHPUnit\Framework\MockObject\StubInternal;
 use PHPUnit\Framework\TestCase;
 use Test\olvlvl\Given\Acme\BooleanValue;
 use Test\olvlvl\Given\Acme\Integer;
@@ -77,9 +80,10 @@ final class ReturnGivenTest extends TestCase
     }
 
     /**
-     * @dataProvider providePassingConstraints
      * @throws Throwable
+     * @phpstan-ignore-next-line
      */
+    #[DataProvider('providePassingConstraints')]
     public function testPassingConstraints(array $givenArguments, array $invokeArguments): void
     {
         $return = uniqid();
@@ -90,6 +94,9 @@ final class ReturnGivenTest extends TestCase
         $this->assertSame($return, $actual);
     }
 
+    /**
+     * @phpstan-ignore-next-line
+     */
     public static function providePassingConstraints(): array
     {
         return [
@@ -130,6 +137,7 @@ final class ReturnGivenTest extends TestCase
     /**
      * @dataProvider provideFailingConstraints
      * @throws Throwable
+     * @phpstan-ignore-next-line
      */
     public function testFailingConstraints(array $givenArguments, array $invokeArguments): void
     {
@@ -142,6 +150,9 @@ final class ReturnGivenTest extends TestCase
         $given->invoke($invocation);
     }
 
+    /**
+     * @phpstan-ignore-next-line
+     */
     public static function provideFailingConstraints(): array
     {
         return [
@@ -180,12 +191,10 @@ final class ReturnGivenTest extends TestCase
     public function testReturnValueMapFailure(): void
     {
         $mock = $this->createMock(IntegerName::class);
-        $mock->method('name')->will(
-            $this->returnValueMap([
-                [ new Integer(6), "six" ],
-                [ new Integer(12), "twelve" ],
-            ])
-        );
+        $mock->method('name')->willReturnMap([
+            [ new Integer(6), "six" ],
+            [ new Integer(12), "twelve" ],
+        ]);
 
         $this->expectException(TypeError::class);
         $this->expectExceptionMessageMatches('/Return value must be of type string, null returned/');
@@ -258,17 +267,16 @@ final class ReturnGivenTest extends TestCase
     public function testMultipleConstraintsUsingCallback(): void
     {
         $mock = $this->createMock(IntegerName::class);
-        $mock->method('name')->will(
-            $this
-                ->returnCallback(function (Integer $int) {
-                    if ($int < new Integer(6)) {
-                        return 'too small';
-                    }
-                    if ($int > new Integer(9)) {
-                        return 'too big';
-                    }
-                    return 'just right';
-                })
+        $mock->method('name')->willReturnCallback(
+            function (Integer $int) {
+                if ($int < new Integer(6)) {
+                    return 'too small';
+                }
+                if ($int > new Integer(9)) {
+                    return 'too big';
+                }
+                return 'just right';
+            }
         );
 
         $this->assertEquals("too small", $mock->name(new Integer(5)));
@@ -297,7 +305,7 @@ final class ReturnGivenTest extends TestCase
     {
         $mock = $this->createMock(IntegerName::class);
         $mock->method('name')->willReturnCallback(
-            fn (Integer $int) => match (true) {
+            fn(Integer $int) => match (true) {
                 $int < new Integer(6) => 'too small',
                 $int > new Integer(9) => 'too big',
                 default => 'just right'
@@ -343,11 +351,39 @@ final class ReturnGivenTest extends TestCase
     private function makeInvocation(mixed ...$parameters): Invocation
     {
         return new Invocation(
-            className: 'SampleClass',
+            className: 'SampleClass', // @phpstan-ignore-line
             methodName: 'SampleMethod',
             parameters: $parameters,
             returnType: 'SampleReturnType',
-            new class () {
+            object: new class () implements StubInternal {
+                public static function __phpunit_initConfigurableMethods(
+                    ConfigurableMethod ...$configurableMethods
+                ): void {
+                    throw new LogicException();
+                }
+
+                public function __phpunit_getInvocationHandler(): InvocationHandler
+                {
+                    throw new LogicException();
+                }
+
+                public function __phpunit_setReturnValueGeneration(bool $returnValueGeneration): void
+                {
+                    throw new LogicException();
+                }
+
+                public function __phpunit_unsetInvocationMocker(): void
+                {
+                    throw new LogicException();
+                }
+
+                /**
+                 * @phpstan-ignore-next-line
+                 */
+                public function __call(string $name, array $arguments)
+                {
+                    throw new LogicException();
+                }
             }
         );
     }
