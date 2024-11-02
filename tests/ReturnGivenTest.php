@@ -343,10 +343,10 @@ final class ReturnGivenTest extends TestCase
     private function makeInvocation(mixed ...$parameters): Invocation
     {
         return new Invocation(
-            'SampleClass',
-            'SampleMethod',
-            $parameters,
-            'SampleReturnType',
+            className: 'SampleClass',
+            methodName: 'SampleMethod',
+            parameters: $parameters,
+            returnType: 'SampleReturnType',
             new class () {
             }
         );

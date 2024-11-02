@@ -50,7 +50,7 @@ final class ReturnGiven implements Stub
     private array $called = [];
 
     public function __construct(
-        private TestCase $testCase
+        private readonly TestCase $testCase
     ) {
     }
 
@@ -153,7 +153,7 @@ final class ReturnGiven implements Stub
      */
     public function invoke(Invocation $invocation): mixed
     {
-        $params = array_values($invocation->getParameters());
+        $params = array_values($invocation->parameters());
 
         foreach ($this->given as $i => $constraints) {
             $this->assertTermination($i);
