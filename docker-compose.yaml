@@ -1,16 +1,5 @@
 ---
 services:
-  app81:
-    build:
-      context: .
-      args:
-        PHP_VERSION: "8.1"
-    environment:
-      PHP_IDE_CONFIG: 'serverName=olvlvl-phpunit-given'
-    volumes:
-      - .:/app:delegated
-      - ~/.composer:/root/.composer:delegated
-    working_dir: /app
   app82:
     build:
       context: .

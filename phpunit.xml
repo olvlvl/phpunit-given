@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+		 xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.4/phpunit.xsd"
 		 bootstrap="./vendor/autoload.php"
          colors="true"
+         displayDetailsOnPhpunitDeprecations="true"
 >
-	<coverage>
+	<source>
 		<include>
-			<directory suffix=".php">./lib</directory>
+			<directory>./lib</directory>
 		</include>
-	</coverage>
+	</source>
 	<testsuites>
 		<testsuite name="olvlvl/phpunit-given">
 			<directory>./tests</directory>

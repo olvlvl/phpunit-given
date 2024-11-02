@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v11.0
+
+### New Requirements
+
+- PHPUnit 11
+- PHP 8.2+
+
+
+
 ## v10.0
 
 ### New Requirements

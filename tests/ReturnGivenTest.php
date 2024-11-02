@@ -11,6 +11,7 @@ use PHPUnit\Framework\MockObject\ConfigurableMethod;
 use PHPUnit\Framework\MockObject\Invocation;
 use PHPUnit\Framework\MockObject\InvocationHandler;
 use PHPUnit\Framework\MockObject\StubInternal;
+use PHPUnit\Framework\MockObject\TestDoubleState;
 use PHPUnit\Framework\TestCase;
 use Test\olvlvl\Given\Acme\BooleanValue;
 use Test\olvlvl\Given\Acme\Integer;
@@ -135,10 +136,10 @@ final class ReturnGivenTest extends TestCase
     }
 
     /**
-     * @dataProvider provideFailingConstraints
      * @throws Throwable
      * @phpstan-ignore-next-line
      */
+    #[DataProvider('provideFailingConstraints')]
     public function testFailingConstraints(array $givenArguments, array $invokeArguments): void
     {
         $return = uniqid();
@@ -381,6 +382,16 @@ final class ReturnGivenTest extends TestCase
                  * @phpstan-ignore-next-line
                  */
                 public function __call(string $name, array $arguments)
+                {
+                    throw new LogicException();
+                }
+
+                public function __phpunit_state(): TestDoubleState
+                {
+                    throw new LogicException();
+                }
+
+                public function __phpunit_wasGeneratedAsMockObject(): bool
                 {
                     throw new LogicException();
                 }

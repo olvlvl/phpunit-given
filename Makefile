@@ -32,12 +32,7 @@ test-coveralls: test-dependencies
 	@$(PHPUNIT) --coverage-clover build/logs/clover.xml
 
 .PHONY: test-container
-test-container: test-container-81
-
-.PHONY: test-container-81
-test-container-81:
-	@-docker-compose run --rm app81 bash
-	@docker-compose down -v
+test-container: test-container-82
 
 .PHONY: test-container-82
 test-container-82:

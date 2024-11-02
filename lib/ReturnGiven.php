@@ -7,6 +7,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\MockObject\Builder\Stub as StubBuilder;
 use PHPUnit\Framework\MockObject\Invocation;
+use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use PHPUnit\Framework\MockObject\Stub\ReturnValueMap;
 use PHPUnit\Framework\MockObject\Stub\Stub;
@@ -135,8 +136,7 @@ final class ReturnGiven implements Stub
         }
 
         if (is_string($exception)) {
-            $exception = $this->testCase
-                ->getMockBuilder($exception)
+            $exception = (new MockBuilder($this->testCase, $exception))
                 ->disableOriginalConstructor()
                 ->getMock();
         }
@@ -182,15 +182,15 @@ final class ReturnGiven implements Stub
     public function toString(): string
     {
         return '[ ' . implode(
-            ", ",
-            array_map(
-                fn($a) => '[ ' . implode(
-                    ', ',
-                    array_map(fn(Constraint $c) => $c->toString(), $a)
-                )  . ' ]',
-                $this->given
-            )
-        ) . ' ]';
+                ", ",
+                array_map(
+                    fn($a) => '[ ' . implode(
+                            ', ',
+                            array_map(fn(Constraint $c) => $c->toString(), $a)
+                        ) . ' ]',
+                    $this->given
+                )
+            ) . ' ]';
     }
 
     /**
