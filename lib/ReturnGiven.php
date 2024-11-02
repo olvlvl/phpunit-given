@@ -1,15 +1,7 @@
 <?php
 
-/*
- * (c) Olivier Laviale <olivier.laviale@gmail.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace olvlvl\Given;
 
-use BadMethodCallException;
 use LogicException;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Constraint\Constraint;
@@ -27,11 +19,9 @@ use function array_values;
 use function implode;
 use function is_string;
 
-use const PHP_EOL;
-
 /**
- * A {@link Stub} meant to be used with {@link StubBuilder::will}
- * as an alternative to {@link ReturnValueMap} or {@link ReturnCallback}.
+ * A {@see Stub} meant to be used with {@see StubBuilder::will}
+ * as an alternative to {@see ReturnValueMap} or {@see ReturnCallback}.
  *
  * @internal
  */
@@ -40,7 +30,7 @@ final class ReturnGiven implements Stub
     private int $i = 0;
 
     /**
-     * @var array<int , Constraint[]>
+     * @var array<int, Constraint[]>
      */
     private array $given = [];
 
@@ -182,17 +172,6 @@ final class ReturnGiven implements Stub
 
             return $this->return[$i];
         }
-
-        $constraints = implode(
-            "; ",
-            array_map(
-                fn($a) => implode(
-                    ', ',
-                    array_map(fn(Constraint $c) => $c->toString(), $a)
-                ),
-                $this->given
-            )
-        );
 
         throw new LogicException(
             "Unexpected invocation: {$invocation->toString()}"

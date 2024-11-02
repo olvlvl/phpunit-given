@@ -11,6 +11,24 @@ _olvlvl/phpunit-given_ provides an alternative to [PHPUnit](https://phpunit.de/)
 
 In most cases `ReturnCallback` with `match` can be used effectively. Don't use this package if you're comfortable with these and don't need extra features.
 
+```php
+$mock = $this->createMock(IntegerName::class);
+$mock->method('name')->willReturnCallback(fn (Integer $int) => match (true) {
+    $int < new Integer(6) => 'too small',
+    $int > new Integer(9) => 'too big',
+    default => 'just right';
+}));
+```
+
+```php
+$mock = $this->createMock(IntegerName::class);
+$mock->method('name')->will($this
+    ->given(Assert::lessThan(new Integer(6)))->return('too small')
+    ->given(Assert::greaterThan(new Integer(9)))->return('too big')
+    ->default()->return('just right')
+);
+```
+
 #### Usage
 
 This is a simple example, more [use cases](#use-cases) below.
@@ -99,10 +117,11 @@ Some PHPUnit issues, for reference:
 - [Feature similar to withConsecutive(), but without checking order](https://github.com/sebastianbergmann/phpunit/issues/4026)
 - [Improvements on withConsecutive with return](https://github.com/sebastianbergmann/phpunit/issues/4255)
 - [Remove withConsecutive()](https://github.com/sebastianbergmann/phpunit/issues/4565)
+- [Symphony: Remove occurrences of withConsecutive()](https://github.com/symfony/symfony/pull/49621/files)
 
 ## Use cases
 
-### Comparing objects
+### Comparing with objects
 
 [ReturnValueMap][] doesn't work with objects because it [uses strict equality when comparing
 arguments](https://github.com/sebastianbergmann/phpunit/blob/39efa00da7afd8460975f8532eb2687288472c27/src/Framework/MockObject/Stub/ReturnValueMap.php#L40). The following code throws a `TypeError` exception because `ReturnValueMap` cannot find a match and defaults to a `null` value.
@@ -143,24 +162,13 @@ $mock = $this->createMock(IntegerName::class);
 $mock->method('name')->will($this
     ->given(Assert::lessThan(new Integer(6)))->return('too small')
     ->given(Assert::greaterThan(new Integer(9)))->return('too big')
-    ->default()->return('just right') // `default()` is a shortcut for `given(Assert::anything())`
+    ->default()->return('just right')
 );
 
 $this->assertEquals("too small", $mock->name(new Integer(5)));
 $this->assertEquals("too big", $mock->name(new Integer(10)));
 $this->assertEquals("just right", $mock->name(new Integer(6)));
 $this->assertEquals("just right", $mock->name(new Integer(9)));
-```
-
-Of course, you could use `ReturnCallback`, although it adds logic to the test. Use whatever you feel more comfortable with.
-
-```php
-$mock = $this->createMock(IntegerName::class);
-$mock->method('name')->willReturnCallback(fn (Integer $int) => match (true) {
-    $int < new Integer(6) => 'too small',
-    $int > new Integer(9) => 'too big',
-    default => 'just right';
-}));
 ```
 
 
